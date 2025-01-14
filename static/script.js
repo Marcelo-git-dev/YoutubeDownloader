@@ -16,4 +16,14 @@ $(document).ready(function () {
 
 socket.on('download_status', function (msg) {  
     $('#output').append(msg.data + '\n');  
-});
+});  
+
+socket.on('download_completed', function (msg) {  
+    $('#output').append(msg.data + '\n');  
+    alert(msg.data); // Aviso de sucesso  
+});  
+
+socket.on('download_failed', function (msg) {  
+    $('#output').append(msg.data + '\n');  
+    alert(msg.data); // Aviso de falha  
+});  

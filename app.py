@@ -26,9 +26,15 @@ def baixar_youtube(link, formato, pasta):
                     break  
                 if output:  
                     socketio.emit('download_status', {'data': output.decode(errors='replace')})  
-            return p.poll()  
+
+        # Verificação do resultado do download  
+        if p.returncode == 0:  
+            socketio.emit('download_completed', {'data': 'Download concluído com sucesso!'})  
+        else:  
+            socketio.emit('download_failed', {'data': 'Erro ao baixar o vídeo.'})  
+
     except Exception as e:  
-        socketio.emit('download_status', {'data': f'Erro: {str(e)}'})  
+        socketio.emit('download_failed', {'data': f'Erro: {str(e)}'})  
 
 @socketio.on('start_download')  
 def handle_download(data):  
@@ -37,7 +43,7 @@ def handle_download(data):
     pasta = data['pasta']  
     
     if not validar_url(link):  
-        emit('download_status', {'data': 'Por favor, insira uma URL válida do YouTube.'})  
+        emit('download_failed', {'data': 'Por favor, insira uma URL válida do YouTube.'})  
         return  
 
     threading.Thread(target=baixar_youtube, args=(link, formato, pasta)).start()  # Executa o download em uma nova thread  
@@ -47,4 +53,4 @@ def index():
     return render_template('index.html')  
 
 if __name__ == '__main__':  
-    socketio.run(app, debug=True)
+    socketio.run(app, debug=True)  
