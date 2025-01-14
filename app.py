@@ -15,8 +15,19 @@ def validar_url(url):
     return re.match(regex, url) is not None  
 
 def baixar_youtube(link, formato, pasta):  
-    """Executa o comando para baixar o vídeo do YouTube."""  
-    cmd = f"cd {pasta} && youtube-dl -f {formato} --write-thumbnail {link}"  
+    p = subprocess.Popen(
+        cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+    )
+    output = ""
+    for line in p.stdout:
+        line = line.decode(
+            errors="replace" if (sys.version_info) < (3, 5) else "backslashreplace"
+        ).rstrip()
+        output += line
+        print(line)
+        window.Refresh() if window else None  # yes, a 1-line if, so shoot me
+    retval = p.wait(timeout)
+    return (retval, output)
     
     try:  
         with subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as p:  
